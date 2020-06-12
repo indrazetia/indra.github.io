@@ -8,7 +8,7 @@ else
 workbox.precaching.precacheAndRoute([
     { url: '/manifest.json', revision: '1' },
     { url: '/nav.html', revision: '1' },
-    { url: '/detail.html', revision: '2' },
+    { url: '/detail.html', revision: '1' },
     { url: '/index.html', revision: '1' },
     { url: '/pages/home.html', revision: '1' },
     { url: '/pages/premier.html', revision: '1' },
@@ -39,11 +39,17 @@ workbox.precaching.precacheAndRoute([
   ignoreURLParametersMatching: [/.*/],
 });
 
+
 workbox.routing.registerRoute(
   new RegExp('/pages/'),
     workbox.strategies.staleWhileRevalidate({
         cacheName: 'pages'
     })
+);
+
+workbox.routing.registerRoute(
+  ({ url }) => ['/nav.html', '/index.html', '/detail.html'].includes(url.pathname),
+  workbox.strategies.cacheFirst()
 );
  
 workbox.routing.registerRoute(
