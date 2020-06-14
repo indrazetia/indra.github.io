@@ -36,7 +36,7 @@ workbox.precaching.precacheAndRoute([
     { url: '/src/services/register_worker.js', revision: '1' },
 ], {
   // Ignore all URL parameters.
-  ignoreURLParametersMatching: [/.*/],
+  ignoreUrlParametersMatching: [/.*/],
 });
 
 
@@ -58,7 +58,6 @@ workbox.routing.registerRoute(
     cacheName: `api-football`,
   })
 );
-
 
 self.addEventListener('push', function(event) {
     let body;
