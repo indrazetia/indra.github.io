@@ -14,10 +14,6 @@ workbox.precaching.precacheAndRoute([
     { url: '/pages/premier.html', revision: '1' },
     { url: '/pages/saved.html', revision: '1' },
     { url: '/src/css/materialize.min.css', revision: '1' },
-    { url: '/src/font/font.css', revision: '1' },
-    { url: '/src/font/Montserrat-Regular.ttf', revision: '1' },
-    { url: '/src/font/Montserrat-Bold.ttf', revision: '1' },
-    { url: '/src/font/Material-Icons.woff2', revision: '1' },
     { url: '/assets/icon/icon-72.png', revision: '1' },
     { url: '/assets/icon/favicon.ico', revision: '1' },
     { url: '/assets/icon/icon-96.png', revision: '1' },
@@ -48,9 +44,36 @@ workbox.routing.registerRoute(
 );
 
 workbox.routing.registerRoute(
+  /\.(?:png|ico)$/,
   ({ url }) => ['/nav.html', '/index.html', '/detail.html'].includes(url.pathname),
   workbox.strategies.cacheFirst()
 );
+
+// Menyimpan cache dari CSS Google Fonts
+workbox.routing.registerRoute(
+  /^https:\/\/fonts\.googleapis\.com/,
+  workbox.strategies.staleWhileRevalidate({
+      cacheName: 'google-fonts-style',
+  })
+);
+
+// Menyimpan cache untuk file font selama 1 tahun
+workbox.routing.registerRoute(
+  /^https:\/\/fonts\.gstatic\.com/,
+  workbox.strategies.cacheFirst({
+      cacheName: 'google-fonts-webfonts-style',
+      plugins: [
+          new workbox.cacheableResponse.Plugin({
+              statuses: [0, 200],
+          }),
+          new workbox.expiration.Plugin({
+              maxAgeSeconds: 60 * 60 * 24 * 365,
+              maxEntries: 30,
+          }),
+      ],
+  })
+);
+
  
 workbox.routing.registerRoute(
   /https:\/\/api\.football-data\.org\/v2/,
@@ -58,7 +81,6 @@ workbox.routing.registerRoute(
     cacheName: `api-football`,
   })
 );
-
 self.addEventListener('push', function(event) {
     let body;
     if (event.data) {
